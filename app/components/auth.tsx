@@ -77,7 +77,7 @@ export function AuthPage() {
         }}
       />
 
-      {!accessStore.hideUserApiKey ? (
+      {/* {!accessStore.hideUserApiKey ? (
         <>
           <div className={styles["auth-tips"]}>{Locale.Auth.SubTips}</div>
           <PasswordInput
@@ -107,7 +107,7 @@ export function AuthPage() {
             }}
           />
         </>
-      ) : null}
+      ) : null} */}
 
       <div className={styles["auth-actions"]}>
         <IconButton
@@ -115,12 +115,12 @@ export function AuthPage() {
           type="primary"
           onClick={goChat}
         />
-        <IconButton
+        {/* <IconButton
           text={Locale.Auth.SaasTips}
           onClick={() => {
             goSaas();
           }}
-        />
+        /> */}
       </div>
     </div>
   );

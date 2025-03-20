@@ -52,6 +52,13 @@ export function collectModelTable(
   models: readonly LLMModel[],
   customModels: string,
 ) {
+  console.log(
+    "Input models:",
+    models.map((m) => ({
+      name: m.name,
+      provider: m?.provider?.id,
+    })),
+  );
   const modelTable: Record<
     string,
     {
@@ -64,13 +71,20 @@ export function collectModelTable(
     }
   > = {};
 
+  // 定义允许的 provider 列表
+  const allowedProviders = ["deepseek", "siliconflow"];
+
   // default models
   models.forEach((m) => {
-    // using <modelName>@<providerId> as fullName
-    modelTable[`${m.name}@${m?.provider?.id}`] = {
-      ...m,
-      displayName: m.name, // 'provider' is copied over if it exists
-    };
+    // 只处理允许的 provider
+    if (m.provider && allowedProviders.includes(m.provider.id.toLowerCase())) {
+      const fullName = `${m.name}@${m?.provider?.id}`;
+
+      modelTable[fullName] = {
+        ...m,
+        displayName: m.name,
+      };
+    }
   });
 
   // server custom models

@@ -31,7 +31,6 @@ import {
   showConfirm,
   showToast,
 } from "./ui-lib";
-import { ModelConfigList } from "./model-config";
 
 import { IconButton } from "./button";
 import {
@@ -67,7 +66,6 @@ import {
   RELEASE_URL,
   STORAGE_KEY,
   ServiceProvider,
-  SlotID,
   UPDATE_URL,
   Stability,
   Iflytek,
@@ -86,8 +84,6 @@ import { useSyncStore } from "../store/sync";
 import { nanoid } from "nanoid";
 import { useMaskStore } from "../store/mask";
 import { ProviderType } from "../utils/cloud";
-import { TTSConfigList } from "./tts-config";
-import { RealtimeConfigList } from "./realtime-chat/realtime-config";
 
 function EditPromptModal(props: { id: string; onClose: () => void }) {
   const promptStore = usePromptStore();
@@ -1701,9 +1697,9 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <SyncItems />
+        {/* <SyncItems /> */}
 
-        <List>
+        {/* <List>
           <ListItem
             title={Locale.Settings.Mask.Splash.Title}
             subTitle={Locale.Settings.Mask.Splash.SubTitle}
@@ -1738,7 +1734,7 @@ export function Settings() {
               }
             ></input>
           </ListItem>
-        </List>
+        </List> */}
 
         <List>
           <ListItem
@@ -1774,7 +1770,7 @@ export function Settings() {
           </ListItem>
         </List>
 
-        <List id={SlotID.CustomModel}>
+        {/* <List id={SlotID.CustomModel}>
           {saasStartComponent}
           {accessCodeComponent}
 
@@ -1871,9 +1867,9 @@ export function Settings() {
               }
             ></input>
           </ListItem>
-        </List>
+        </List> */}
 
-        <List>
+        {/* <List>
           <ModelConfigList
             modelConfig={config.modelConfig}
             updateConfig={(updater) => {
@@ -1882,12 +1878,12 @@ export function Settings() {
               config.update((config) => (config.modelConfig = modelConfig));
             }}
           />
-        </List>
+        </List> */}
 
-        {shouldShowPromptModal && (
+        {/* {shouldShowPromptModal && (
           <UserPromptModal onClose={() => setShowPromptModal(false)} />
-        )}
-        <List>
+        )} */}
+        {/* <List>
           <RealtimeConfigList
             realtimeConfig={config.realtimeConfig}
             updateConfig={(updater) => {
@@ -1898,8 +1894,8 @@ export function Settings() {
               );
             }}
           />
-        </List>
-        <List>
+        </List> */}
+        {/* <List>
           <TTSConfigList
             ttsConfig={config.ttsConfig}
             updateConfig={(updater) => {
@@ -1908,7 +1904,7 @@ export function Settings() {
               config.update((config) => (config.ttsConfig = ttsConfig));
             }}
           />
-        </List>
+        </List> */}
 
         <DangerItems />
       </div>
