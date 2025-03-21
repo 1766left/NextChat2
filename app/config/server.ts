@@ -25,6 +25,10 @@ declare global {
       DEFAULT_MODEL?: string; // to control default model in every new chat window
       VISION_MODELS?: string; // to control vision models
 
+      // notion integration
+      NOTION_API_KEY?: string; // notion api key
+      NOTION_DATABASE_ID?: string; // notion database id
+
       // stability only
       STABILITY_URL?: string;
       STABILITY_API_KEY?: string;
@@ -265,5 +269,9 @@ export const getServerSideConfig = () => {
     visionModels,
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
+
+    // notion integration
+    notionApiKey: process.env.NOTION_API_KEY,
+    notionDatabaseId: process.env.NOTION_DATABASE_ID,
   };
 };

@@ -476,6 +476,27 @@ export const useChatStore = createPersistStore(
               botMessage.content = message;
               botMessage.date = new Date().toLocaleString();
               get().onNewMessage(botMessage, session);
+
+              // 记录聊天日志到服务器
+              try {
+                const userMessage = sendMessages[sendMessages.length - 1];
+                const timestamp = new Date().toISOString();
+
+                await fetch("/api/chatlog", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                    sessionId: session.id,
+                    userMessage: userMessage.content,
+                    botMessage: botMessage.content,
+                    timestamp,
+                  }),
+                });
+              } catch (error) {
+                console.error("[Chat Log] Failed to log chat:", error);
+              }
             }
             ChatControllerPool.remove(session.id, botMessage.id);
           },
