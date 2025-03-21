@@ -65,7 +65,7 @@ export function collectModelTable(
   > = {};
 
   // 定义允许的 provider 列表
-  const allowedProviders = ["deepseek", "siliconflow"];
+  const allowedProviders = ["deepseek", "siliconflow", "openai"];
 
   // default models
   models.forEach((m) => {

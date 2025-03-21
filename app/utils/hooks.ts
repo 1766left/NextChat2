@@ -10,9 +10,11 @@ export function useAllModels() {
       "deepseek-chat",
       "deepseek-coder",
       "deepseek-reasoner",
-      "deepseek-ai/DeepSeek-R1",
       "Pro/deepseek-ai/DeepSeek-R1",
       "Pro/deepseek-ai/DeepSeek-V3",
+      "qwq-32b",
+      "qwen-plus",
+      "deepseek-r1",
     ];
 
     const allModels = collectModelsWithDefaultModel(

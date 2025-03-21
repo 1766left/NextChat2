@@ -685,7 +685,7 @@ export function ChatActions(props: {
             items={models.map((m) => ({
               title: `${m.displayName}${
                 m?.provider?.providerName
-                  ? " (" + m?.provider?.providerName + ")"
+                  ? " (" + m?.provider?.providerName.slice(0, 1) + ")"
                   : ""
               }`,
               value: `${m.name}@${m?.provider?.providerName}`,
