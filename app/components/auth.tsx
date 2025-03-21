@@ -9,7 +9,6 @@ import Delete from "../icons/close.svg";
 import Arrow from "../icons/arrow.svg";
 import Logo from "../icons/logo.svg";
 import { useMobileScreen } from "@/app/utils";
-import BotIcon from "../icons/bot.svg";
 import { getClientConfig } from "../config/client";
 import { PasswordInput } from "./ui-lib";
 import LeftIcon from "@/app/icons/left.svg";
@@ -48,7 +47,7 @@ export function AuthPage() {
 
   return (
     <div className={styles["auth-page"]}>
-      <TopBanner></TopBanner>
+      {/* <TopBanner></TopBanner> */}
       <div className={styles["auth-header"]}>
         <IconButton
           icon={<LeftIcon />}
@@ -56,9 +55,9 @@ export function AuthPage() {
           onClick={() => navigate(Path.Home)}
         ></IconButton>
       </div>
-      <div className={clsx("no-dark", styles["auth-logo"])}>
+      {/* <div className={clsx("no-dark", styles["auth-logo"])}>
         <BotIcon />
-      </div>
+      </div> */}
 
       <div className={styles["auth-title"]}>{Locale.Auth.Title}</div>
       <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div>
