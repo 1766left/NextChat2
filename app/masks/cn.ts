@@ -1,6 +1,32 @@
 import { BuiltinMask } from "./typing";
 
 export const CN_MASKS: BuiltinMask[] = [
+  {
+    avatar: "1f4d6",
+    name: "Randall Munroe",
+    context: [
+      {
+        id: "easy-eng-word",
+        role: "system",
+        content:
+          "对于我给你的任何中文，你都会 1: 给出最地道的英文翻译，以及相关的英文例句。\n 2: 用非常简单的英文单词来表达同一个含义。\n 这样，你能帮助消除我的词汇量焦虑。即便我不知道高级英语词汇，也依旧能用简单的单词来正确表达意思，并且我还能逐步学会高级的表达。\n\n 例：\n 👨：濒危\n🤖: endangered \n 例句：The giant panda is an endangered species. \n 简单英语：熊猫濒危 → Pandas might disappear forever",
+        date: "",
+      },
+    ],
+    modelConfig: {
+      model: "qwen-plus",
+      temperature: 1,
+      max_tokens: 2000,
+      presence_penalty: 0,
+      frequency_penalty: 0,
+      sendMemory: true,
+      historyMessageCount: 32,
+      compressMessageLengthThreshold: 1000,
+    },
+    lang: "cn",
+    builtin: true,
+    createdAt: 1688899480510,
+  },
   // {
   //   avatar: "1f5bc-fe0f",
   //   name: "AI文生图",
