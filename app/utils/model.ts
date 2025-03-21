@@ -52,13 +52,6 @@ export function collectModelTable(
   models: readonly LLMModel[],
   customModels: string,
 ) {
-  console.log(
-    "Input models:",
-    models.map((m) => ({
-      name: m.name,
-      provider: m?.provider?.id,
-    })),
-  );
   const modelTable: Record<
     string,
     {
