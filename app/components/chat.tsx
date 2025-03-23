@@ -2060,6 +2060,16 @@ function _Chat() {
                                 selection &&
                                 selection.toString().trim().length > 0
                               ) {
+                                // 检查选择是否跨越多个节点
+                                const range = selection.getRangeAt(0);
+                                // 如果起始和结束容器不同，说明选择跨越了多个节点
+                                if (
+                                  range.startContainer !== range.endContainer
+                                ) {
+                                  // 跨节点选择，不显示高亮按钮
+                                  return;
+                                }
+
                                 // 创建高亮按钮
                                 const highlightBtn =
                                   document.createElement("div");
@@ -2083,32 +2093,100 @@ function _Chat() {
                                     // 阻止事件冒泡
                                     event.stopPropagation();
 
-                                    console.log("高亮按钮被点击");
                                     const selectedText = selection.toString();
                                     const originalContent =
                                       getMessageTextContent(message);
-                                    console.log("[ORIGINAL]" + originalContent);
 
                                     // 创建新内容，将选中文本用@@@包围
                                     let newContent = originalContent;
                                     if (typeof originalContent === "string") {
-                                      const highlightedText = `@@@${selectedText}@@@`;
-                                      const startPos =
-                                        originalContent.indexOf(selectedText);
-                                      if (startPos !== -1) {
-                                        newContent =
-                                          originalContent.substring(
-                                            0,
-                                            startPos,
-                                          ) +
-                                          highlightedText +
-                                          originalContent.substring(
-                                            startPos + selectedText.length,
+                                      // 处理Markdown文本中的选中内容
+                                      // 首先获取选中文本的范围信息
+                                      const range = selection.getRangeAt(0);
+                                      const container =
+                                        range.commonAncestorContainer;
+
+                                      // 获取选中文本在DOM中的上下文信息
+                                      let contextNode = container;
+                                      while (
+                                        contextNode &&
+                                        (!(contextNode as Element).classList ||
+                                          !(
+                                            contextNode as Element
+                                          ).classList.contains(
+                                            styles["chat-message-item"],
+                                          ))
+                                      ) {
+                                        // 确保parentNode不为null再赋值给contextNode
+                                        if (contextNode.parentNode) {
+                                          contextNode = contextNode.parentNode;
+                                        } else {
+                                          break; // 如果没有父节点则退出循环
+                                        }
+                                      }
+
+                                      // 如果选中的文本跨越多个Markdown元素，需要特殊处理
+                                      if (
+                                        selectedText.includes("\n") ||
+                                        (container.nodeType ===
+                                          Node.TEXT_NODE &&
+                                          container.parentNode?.nodeName.match(
+                                            /^(P|H1|H2|H3|H4|H5|H6|LI|BLOCKQUOTE|PRE|CODE)$/i,
+                                          ))
+                                      ) {
+                                        // 将选中文本按Markdown分隔符拆分
+                                        const segments = selectedText
+                                          .split(
+                                            /(\n|(?=[#*\->\s])|(?<=[#*\->\s]))/g,
+                                          )
+                                          .filter(
+                                            (seg) => seg.trim().length > 0,
                                           );
+
+                                        // 对每个片段进行处理
+                                        let processedText = selectedText;
+                                        segments.forEach((segment) => {
+                                          if (segment.trim().length > 0) {
+                                            const escapedSegment =
+                                              segment.replace(
+                                                /[.*+?^${}()|[\]\\]/g,
+                                                "\\$&",
+                                              );
+                                            const regex = new RegExp(
+                                              `(?<!@@@)(${escapedSegment})(?!@@@)`,
+                                              "g",
+                                            );
+                                            processedText =
+                                              processedText.replace(
+                                                regex,
+                                                "@@@$1@@@",
+                                              );
+                                          }
+                                        });
+
+                                        // 替换原文中的选中文本
+                                        newContent = originalContent.replace(
+                                          selectedText,
+                                          processedText,
+                                        );
+                                      } else {
+                                        // 简单情况：直接在原文中查找并替换选中文本
+                                        // 使用正则表达式确保只替换完整匹配的文本，避免部分匹配
+                                        const escapedText =
+                                          selectedText.replace(
+                                            /[.*+?^${}()|[\]\\]/g,
+                                            "\\$&",
+                                          );
+                                        const regex = new RegExp(
+                                          `(?<!@@@)(${escapedText})(?!@@@)`,
+                                          "g",
+                                        );
+                                        newContent = originalContent.replace(
+                                          regex,
+                                          "@@@$1@@@",
+                                        );
                                       }
                                     }
-
-                                    console.log("[NEW]" + newContent);
 
                                     // 更新消息内容
                                     let finalContent:
@@ -2131,7 +2209,6 @@ function _Chat() {
                                         });
                                       }
                                     }
-                                    console.log("[FINAL]" + finalContent);
 
                                     // 更新到存储
                                     chatStore.updateTargetSession(
