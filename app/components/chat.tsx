@@ -130,9 +130,95 @@ const localStorage = safeLocalStorage();
 
 const ttsPlayer = createTTSPlayer();
 
-const Markdown = dynamic(async () => (await import("./markdown")).Markdown, {
-  loading: () => <LoadingIcon />,
-});
+// 添加一个新的工具函数，用于处理文本节点中的@@@包围的内容
+function processTextWithTripleAt(node: Node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    const text = node.textContent || "";
+    const regex = /@@@([^@]+)@@@/g;
+
+    if (regex.test(text)) {
+      const fragment = document.createDocumentFragment();
+      let lastIndex = 0;
+      let match;
+
+      // 重置正则表达式
+      regex.lastIndex = 0;
+
+      while ((match = regex.exec(text)) !== null) {
+        // 添加匹配前的文本
+        if (match.index > lastIndex) {
+          fragment.appendChild(
+            document.createTextNode(text.substring(lastIndex, match.index)),
+          );
+        }
+
+        // 创建红色文本元素
+        const redSpan = document.createElement("span");
+        redSpan.style.color = "red";
+        redSpan.textContent = match[1]; // 匹配组中的内容（不包含@@@）
+        fragment.appendChild(redSpan);
+
+        lastIndex = regex.lastIndex;
+      }
+
+      // 添加最后一部分文本
+      if (lastIndex < text.length) {
+        fragment.appendChild(
+          document.createTextNode(text.substring(lastIndex)),
+        );
+      }
+
+      // 替换原始节点
+      if (node.parentNode) {
+        node.parentNode.replaceChild(fragment, node);
+      }
+
+      return true;
+    }
+  }
+  return false;
+}
+
+// 递归处理所有节点
+function processNodeForTripleAt(node: Node) {
+  // 如果是文本节点且已处理，则不需要处理子节点
+  if (processTextWithTripleAt(node)) {
+    return;
+  }
+
+  // 处理子节点
+  const childNodes = Array.from(node.childNodes);
+  childNodes.forEach((child) => {
+    processNodeForTripleAt(child);
+  });
+}
+
+// 修改Markdown组件，添加对渲染后内容的处理
+const Markdown = dynamic(
+  async () => {
+    const { Markdown } = await import("./markdown");
+
+    // 返回增强后的Markdown组件
+    return function EnhancedMarkdown(props: any) {
+      const markdownRef = useRef<HTMLDivElement>(null);
+
+      useEffect(() => {
+        if (markdownRef.current) {
+          processNodeForTripleAt(markdownRef.current);
+        }
+      }, [props.content]); // 当内容变化时重新处理
+
+      return (
+        <div ref={markdownRef}>
+          <Markdown {...props} />
+        </div>
+      );
+    };
+  },
+  {
+    loading: () => <LoadingIcon />,
+  },
+);
 
 const MCPAction = () => {
   const navigate = useNavigate();
@@ -1966,7 +2052,135 @@ function _Chat() {
                               ))}
                             </div>
                           )}
-                          <div className={styles["chat-message-item"]}>
+                          <div
+                            className={styles["chat-message-item"]}
+                            onMouseUp={(e) => {
+                              const selection = window.getSelection();
+                              if (
+                                selection &&
+                                selection.toString().trim().length > 0
+                              ) {
+                                // 创建高亮按钮
+                                const highlightBtn =
+                                  document.createElement("div");
+                                highlightBtn.className =
+                                  styles["highlight-btn"] || "highlight-btn";
+                                highlightBtn.textContent = "高亮";
+                                highlightBtn.style.position = "absolute";
+                                highlightBtn.style.left = `${e.clientX + 10}px`;
+                                highlightBtn.style.top = `${e.clientY - 30}px`;
+                                highlightBtn.style.backgroundColor = "#4caf50";
+                                highlightBtn.style.color = "white";
+                                highlightBtn.style.padding = "4px 8px";
+                                highlightBtn.style.borderRadius = "4px";
+                                highlightBtn.style.cursor = "pointer";
+                                highlightBtn.style.zIndex = "1000";
+
+                                // 点击高亮按钮的处理函数
+                                highlightBtn.addEventListener(
+                                  "click",
+                                  function (event) {
+                                    // 阻止事件冒泡
+                                    event.stopPropagation();
+
+                                    console.log("高亮按钮被点击");
+                                    const selectedText = selection.toString();
+                                    const originalContent =
+                                      getMessageTextContent(message);
+                                    console.log("[ORIGINAL]" + originalContent);
+
+                                    // 创建新内容，将选中文本用@@@包围
+                                    let newContent = originalContent;
+                                    if (typeof originalContent === "string") {
+                                      const highlightedText = `@@@${selectedText}@@@`;
+                                      const startPos =
+                                        originalContent.indexOf(selectedText);
+                                      if (startPos !== -1) {
+                                        newContent =
+                                          originalContent.substring(
+                                            0,
+                                            startPos,
+                                          ) +
+                                          highlightedText +
+                                          originalContent.substring(
+                                            startPos + selectedText.length,
+                                          );
+                                      }
+                                    }
+
+                                    console.log("[NEW]" + newContent);
+
+                                    // 更新消息内容
+                                    let finalContent:
+                                      | string
+                                      | MultimodalContent[] = newContent;
+                                    const images = getMessageImages(message);
+                                    if (images.length > 0) {
+                                      finalContent = [
+                                        {
+                                          type: "text",
+                                          text: newContent as string,
+                                        },
+                                      ];
+                                      for (let i = 0; i < images.length; i++) {
+                                        finalContent.push({
+                                          type: "image_url",
+                                          image_url: {
+                                            url: images[i],
+                                          },
+                                        });
+                                      }
+                                    }
+                                    console.log("[FINAL]" + finalContent);
+
+                                    // 更新到存储
+                                    chatStore.updateTargetSession(
+                                      session,
+                                      (session) => {
+                                        const m = session.mask.context
+                                          .concat(session.messages)
+                                          .find((m) => m.id === message.id);
+                                        if (m) {
+                                          m.content = finalContent;
+                                        }
+                                      },
+                                    );
+
+                                    // 移除高亮按钮
+                                    if (document.body.contains(highlightBtn)) {
+                                      document.body.removeChild(highlightBtn);
+                                    }
+                                  },
+                                );
+
+                                // 添加到文档中
+                                document.body.appendChild(highlightBtn);
+
+                                // 点击其他地方时移除高亮按钮
+                                const removeBtn = (e: MouseEvent) => {
+                                  // 确保点击的不是高亮按钮本身
+                                  if (
+                                    e.target !== highlightBtn &&
+                                    document.body.contains(highlightBtn)
+                                  ) {
+                                    document.body.removeChild(highlightBtn);
+                                    document.removeEventListener(
+                                      "mousedown",
+                                      removeBtn,
+                                    );
+                                  }
+                                };
+
+                                // 延迟添加事件监听器，避免立即触发
+                                setTimeout(() => {
+                                  document.addEventListener(
+                                    "mousedown",
+                                    removeBtn,
+                                  );
+                                }, 100);
+                              }
+                            }}
+                          >
                             <Markdown
                               key={message.streaming ? "loading" : "done"}
                               content={getMessageTextContent(message)}

@@ -750,4 +750,22 @@
       transform: translateX(0);
     }
   }
+
+  .highlight-btn {
+    position: absolute;
+    background-color: #4caf50;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1000;
+    font-size: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  
+  .highlight-btn:hover {
+    background-color: #45a049;
+  }
 }
