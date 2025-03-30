@@ -82,7 +82,7 @@ export enum SlotID {
 
 export enum FileName {
   Masks = "masks.json",
-  Prompts = "prompts.json",
+  Prompts = "not_exists.json",
 }
 
 export enum StoreKey {

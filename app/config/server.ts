@@ -270,6 +270,9 @@ export const getServerSideConfig = () => {
     allowedWebDavEndpoints,
     enableMcp: process.env.ENABLE_MCP === "true",
 
+    // 添加对 PROMPT_TEMPLATE 环境变量的支持
+    promptTemplate: process.env.PROMPT_TEMPLATE,
+
     // notion integration
     notionApiKey: process.env.NOTION_API_KEY,
     notionDatabaseId: process.env.NOTION_DATABASE_ID,

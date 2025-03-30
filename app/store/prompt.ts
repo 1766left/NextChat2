@@ -4,6 +4,9 @@ import { StoreKey } from "../constant";
 import { getLang } from "../locales";
 import { createPersistStore } from "../utils/store";
 
+// 移除未使用的导入
+// import { Console } from "console";
+
 export interface Prompt {
   id: string;
   isUser?: boolean;
@@ -152,12 +155,32 @@ export const usePromptStore = createPersistStore(
         return;
       }
 
-      const PROMPT_URL = "./prompts.json";
+      // 默认的提示词模板URL
+      const DEFAULT_PROMPT_URL = "./prompts.json";
+
+      // 使用公共环境变量，这些变量在构建时会被注入到客户端代码中
+      const PROMPT_URL =
+        // @ts-ignore - 这里忽略类型检查，因为 process.env 在客户端可能是未定义的
+        (typeof process !== "undefined" &&
+          process.env.NEXT_PUBLIC_PROMPT_TEMPLATE) ||
+        DEFAULT_PROMPT_URL;
 
       type PromptList = Array<[string, string]>;
 
       fetch(PROMPT_URL)
         .then((res) => res.json())
+        .catch((err) => {
+          console.error("Failed to fetch prompts:", err);
+          // 如果获取失败，尝试使用默认路径
+          if (PROMPT_URL !== DEFAULT_PROMPT_URL) {
+            console.log(
+              "Falling back to default prompt URL:",
+              DEFAULT_PROMPT_URL,
+            );
+            return fetch(DEFAULT_PROMPT_URL).then((res) => res.json());
+          }
+          throw err;
+        })
         .then((res) => {
           let fetchPrompts = [res.en, res.tw, res.cn];
           if (getLang() === "cn") {
