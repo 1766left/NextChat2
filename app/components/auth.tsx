@@ -62,8 +62,21 @@ export function AuthPage() {
       <div className={styles["auth-title"]}>{Locale.Auth.Title}</div>
       <div className={styles["auth-tips"]}>{Locale.Auth.Tips}</div>
 
+      <input
+        style={{ marginTop: "3vh", marginBottom: "1vh" }}
+        aria-label="用户名"
+        value={accessStore.userName || ""}
+        type="text"
+        placeholder="用户名"
+        onChange={(e) => {
+          accessStore.update(
+            (access) => (access.userName = e.currentTarget.value),
+          );
+        }}
+      />
+
       <PasswordInput
-        style={{ marginTop: "3vh", marginBottom: "3vh" }}
+        style={{ marginTop: "2vh", marginBottom: "3vh" }}
         aria={Locale.Settings.ShowPassword}
         aria-label={Locale.Auth.Input}
         value={accessStore.accessCode}

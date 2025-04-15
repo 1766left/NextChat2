@@ -676,16 +676,28 @@ export function Settings() {
       title={Locale.Settings.Access.AccessCode.Title}
       subTitle={Locale.Settings.Access.AccessCode.SubTitle}
     >
-      <PasswordInput
-        value={accessStore.accessCode}
-        type="text"
-        placeholder={Locale.Settings.Access.AccessCode.Placeholder}
-        onChange={(e) => {
-          accessStore.update(
-            (access) => (access.accessCode = e.currentTarget.value),
-          );
-        }}
-      />
+      <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+        <input
+          type="text"
+          value={accessStore.userName || ""}
+          placeholder="用户名"
+          onChange={(e) => {
+            accessStore.update(
+              (access) => (access.userName = e.currentTarget.value),
+            );
+          }}
+        />
+        <PasswordInput
+          value={accessStore.accessCode}
+          type="text"
+          placeholder={Locale.Settings.Access.AccessCode.Placeholder}
+          onChange={(e) => {
+            accessStore.update(
+              (access) => (access.accessCode = e.currentTarget.value),
+            );
+          }}
+        />
+      </div>
     </ListItem>
   );
 
@@ -1769,6 +1781,8 @@ export function Settings() {
             />
           </ListItem>
         </List>
+
+        <List>{accessCodeComponent}</List>
 
         {/* <List id={SlotID.CustomModel}>
           {saasStartComponent}

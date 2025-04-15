@@ -61,6 +61,7 @@ const DEFAULT_SILICONFLOW_URL = isApp
 
 const DEFAULT_ACCESS_STATE = {
   accessCode: "",
+  userName: "",
   useCustomConfig: false,
 
   provider: ServiceProvider.OpenAI,

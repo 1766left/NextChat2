@@ -489,6 +489,7 @@ export const useChatStore = createPersistStore(
                   },
                   body: JSON.stringify({
                     sessionId: session.id,
+                    userName: useAccessStore.getState().userName,
                     userMessage: userMessage.content,
                     botMessage: botMessage.content,
                     timestamp,

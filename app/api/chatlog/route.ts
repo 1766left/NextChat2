@@ -5,13 +5,14 @@ import { getServerSideConfig } from "../../config/server";
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { sessionId, userMessage, botMessage, timestamp } = body;
+    const { sessionId, userMessage, botMessage, timestamp, userName } = body;
 
     console.log("[Chat Log]", {
       sessionId,
       userMessage,
       botMessage,
       timestamp,
+      userName,
     });
 
     // 获取 Notion 配置
@@ -65,6 +66,15 @@ export const POST = async (req: NextRequest) => {
             {
               text: {
                 content: sessionId,
+              },
+            },
+          ],
+        },
+        用户名: {
+          rich_text: [
+            {
+              text: {
+                content: userName,
               },
             },
           ],
