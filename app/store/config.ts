@@ -64,7 +64,7 @@ export const DEFAULT_CONFIG = {
   models: DEFAULT_MODELS as any as LLMModel[],
 
   modelConfig: {
-    model: "deepseek-r1" as ModelType,
+    model: "qwen-plus" as ModelType,
     providerName: "OpenAI" as ServiceProvider,
     temperature: 0.6,
     top_p: 1,
